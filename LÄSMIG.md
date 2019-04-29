@@ -10,7 +10,7 @@ Hypatia låter en prova på att analysera riktig data från partikelkollisioner 
 - scipy
 
 **Installation**  
-Börja med att se till att [python](www.python.org) 3.x är installerat.  
+Börja med att se till att [python](www.python.org) 3.x är installerat och finns med i miljövariabeln PATH.  
 Kör installera.py. Denna korta script försöker ladda ner de krävda python paketen via pip.  
 
 **Användning**  
