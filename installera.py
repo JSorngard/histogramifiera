@@ -12,15 +12,15 @@ if(__name__=='__main__'):
 	
 	#Uppdatera pip om det behövs
 	pipup=False
-	if("version of pip" in modlist):
+	if("You should consider upgrading" in modlist):
 		pipup=True
 		subprocess.call([sys.executable,"-m","pip","install","--upgrade","pip"])
 
 	for dependency in dependecies:
 		if(dependency not in modlist):
-			print("Kunde inte hitta "+package+", installerar...")
-			subprocess.call([sys.executable,"-m","pip","install",package])
-			print("Färdig med "+package+".")
+			print("Kunde inte hitta "+dependency+", installerar...")
+			subprocess.call([sys.executable,"-m","pip","install",dependency])
+			print("Färdig med "+dependency+".")
 	if(pipup):
 		print("Uppdaterade pip.")
 	if(any(installerat)):

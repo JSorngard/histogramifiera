@@ -6,25 +6,27 @@ from scipy.stats import cauchy #Behövs för att dra från cauchyfördelningen.
 import argparse #Behövs för att läsa in kommandon från kommandotolken.
 import matplotlib.pyplot as plt #Behövs för plottning.
 
-
 #Ta fram vilken mapp vi befinner oss i.
 mydir=os.path.dirname(os.path.realpath(__file__))
 
 #Initeira variabler
 files=[]
 occupied=[]
-signalpts=100 #Hur många datapunkter simuleras
-signalnoiceratio=.15 #Hur mycket brus i förhållande till signal.
-utnamn="simulerad_data_" #Prefix på de genererade filerna.
 
 #------------------------------Hårdkodade alternativ---------------------
 particlemasses=[3.096916,91.1876,1000] #GeV/c^2. Massorna hos partiklarna vi vill simulera.
 widths=[93.2*10**(3-9),2.4952,10] #GeV/c^2. Massvidderna hos partiklarna.
 relativepower=[.1,1,.1] #Hur stark signalen från parikeln är i jämförelse med de andra.
+
 threshold=.005 #Ignorerar att simulera processer mer osannolika än detta.
+signalpts=100 #Hur många datapunkter simuleras
+signalnoiceratio=.15 #Hur mycket brus i förhållande till signal.
+
+utnamn="simulerad_data_" #Prefix på de genererade filerna.
 #-------------------------------------------------------------------------
 
-#Möjliggör användande av extrakommandon i kommandotolken för att ändra beteendet hos programmet.
+
+#---------------------Hantera kommandoradsalternativ----------------------
 parser=argparse.ArgumentParser(description='Genererar data som ser ut som den som exporteras från Hypatia.')
 parser.add_argument("-n","--datapoints",required=False,type=int,default=signalpts,help="Specificera mängden datapunkter du vill generera med detta argument. Om det inte anges genereras "+str(signalpts)+" datapunkter.")
 parser.add_argument("-r","--snratio",required=False,type=int,default=signalnoiceratio,help="Specifiera bruskvoten. Om inget anges används "+str(signalnoiceratio)+" som kvot.")
@@ -37,22 +39,28 @@ parser.add_argument("-d","--debug",required=False,action="store_true",help="Om d
 args=vars(parser.parse_args())
 
 debug=args["debug"]
-
 if(debug):
     print("\nDEBUG-läge aktiverat. Fler utskrifter följer.\n")
+
 
 signalpts=args["datapoints"]
 if(signalpts<=0):
     print("Du måste begära fler än 0 datapunkter.")
     exit()
+
 signalnoiceratio=args["snratio"]
 if(signalnoiceratio<0):
     print("Bruskvoten måste vara ett positivt tal.")
     exit()
-plot=args["plot"]
-write=args["nowrite"]
-modutnamn=args["outputname"]
 
+plot=args["plot"]
+
+write=args["nowrite"]
+
+modutnamn=args["outputname"]
+#-------------------------------------------------------------------------
+
+#Kom ihåg ifall namnet på utskriftsfilen har ändrats.
 overwrite=False
 if(modutnamn!=utnamn):
     overwrite=True
@@ -63,7 +71,8 @@ if(debug):
     print("    begärda datapunkter: "+str(signalpts)+", bruskvot: "+str(signalnoiceratio)+",")
     print("    ska det plottas? "+str(plot)+", ska det skrivas till fil? "+str(write))
     if(modutnamn and write):
-        print("    resultat skrivs till"+mydir+"\\"+utnamn+".txt")
+        print("    resultat skrivs till "+mydir+"\\"+utnamn+".txt")
+
 
 #Binär sökning genom lista. Returnerar indexen för de två närmast liggande punkterna till target.
 #Används för att invertera den kumulativa sannolikhetsfördelningen.
@@ -93,16 +102,18 @@ for file in os.listdir(mydir):
 
 #Om inget filnamn angetts, kolla ifall det redan finns datafiler genererade av programmet med standardnamnet.
 if(len(files)!=0 and not overwrite):
-	for file in files:
-		occupied.append(int(file.replace(utnamn,'').replace('.txt','').split("\\")[-1]))
+    for file in files:
+        try:
+            occupied.append(int(file.replace(utnamn,'').replace('.txt','').split("\\")[-1]))
+        except ValueError:
+            #Det finns txt-filer som inte ser ut som utnamn_<siffra>. Detta är harmlöst.
+            pass
 occupied.append(0)
 
 if(debug and len(files)!=0):
     print("    hittade filer.\n")
 elif(debug):
     print("    hittade inga filer.\n")
-
-#PHYSICS TIME!
 
 #Normalisera de relativa bidragen
 relativepower=relativepower/np.linalg.norm(relativepower)
@@ -138,11 +149,11 @@ probs=[random.random() for i in range(signalpts)]
 
 if(debug):
     print("  inverterar kumulativ sannolikhetsfördelning...")
+#Mest tid spenderas här.
 lus=[binary_search(distcdf,pt) for pt in probs]
 
 if(debug):
     print("   beräknar massor...")
-#masses=[distcdf[bisect(distcdf,pt)] for pt in probs] #Ett försök till snabbare invertering.
 masses=[(x[l]+x[u])/2 for (l,u) in lus]
 
 if(debug):
@@ -158,11 +169,11 @@ if(signalnoiceratio!=0):
 
 if(debug and write):
     print("Skriver ut datan till fil...")
-
-#Skriv ut till en ny fil.
 if(write and overwrite):
+    #Skriv över en redan existerande fil.
     np.savetxt(mydir+"\\"+utnamn+".txt",masses,fmt='%f')
 elif(write):
+    #Skriv ut till en ny fil.
     np.savetxt(mydir+"\\"+utnamn+str(max(occupied)+1)+".txt",masses,fmt='%f')
 
 if(debug and write):
@@ -172,19 +183,21 @@ if(debug and write):
 if(plot):
     if(debug):
         print("Plottar...")
+
+    xtext="Invariant massa [GeV/c^2]"
     cdfplot=plt.figure(2)
     plt.plot(x,distcdf)
-    plt.xlabel("Invariant massa [GeV/c^2]")
+    plt.xlabel(xtext)
     plt.title("Kumulativ sannolikhetsfördelning")
 
     pdfplot=plt.figure(1)
     N=len(masses)
     binfactor=2
     #Skalar om sannolikhetsfördelningen så att den går att se i histogrammet.
-    plt.plot(x,10/binfactor*N*distpdf,label="Sannolikhetsfördelning")
+    plt.plot(x,10/binfactor*N*distpdf,label="Sannolikhetsfördelning",lw=1)
     bins=int(round(binfactor*np.sqrt(N)))
     plt.hist(masses,bins=bins,label="Data")
-    plt.xlabel("Invariant massa [GeV/c^2]")
+    plt.xlabel(xtext)
     plt.title("Skalad sannolikhetsfördelning och datan som genererades från den.")
     plt.legend()
     plt.show()
