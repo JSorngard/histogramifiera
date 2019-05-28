@@ -43,22 +43,28 @@ class inputwindow(tk.Frame):
         dologplot = self.dolog.get()
         self.quit()
 
-pathstring=""
+#Startar upp det lilla inputfönstret.
 pathwindow=inputwindow()
 pathwindow.master.title("Ange alternativ.")
 pathwindow.mainloop()
 
+#När vi kommit hit är fönstret dött och vi fortsätter som en vanlig scipt.
+
+#Byt ut \ mot \\ så att de kommer att tolkas korrekt av histogramifiera.pyw.
 pathstring.replace("\\","\\\\")
 
+#Testa att läsa in maxmassan till en int, funkar det inte anges ingen maxmassa, annars skickas den med "-m".
 if(massstring != ""):
     try:
         massstring = "-m "+str(int(massstring))
     except:
         massstring = ""
 
+#Om en sökväg inte är angiven, skicka nuvarande plats med "-p".
 if(pathstring=="" or pathstring==pathdefault):
     pathstring=os.path.dirname(os.path.realpath(__file__))
 
+#Om logplot är 1, lägg till "-l" som kommando.
 logstring=""
 if(dologplot):
     logstring = " -l"
