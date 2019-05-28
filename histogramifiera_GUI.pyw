@@ -51,7 +51,11 @@ pathwindow.mainloop()
 #När vi kommit hit är fönstret dött och vi fortsätter som en vanlig scipt.
 
 #Byt ut \ mot \\ så att de kommer att tolkas korrekt av histogramifiera.pyw.
-pathstring.replace("\\","\\\\")
+try:
+    pathstring.replace("\\","\\\\")
+except:
+    #pathstring är inte definierad, alltså har användargränssnittet kryssats bort. Säkert att stänga av.
+    exit()
 
 #Testa att läsa in maxmassan till en int, funkar det inte anges ingen maxmassa, annars skickas den med "-m".
 if(massstring != ""):
