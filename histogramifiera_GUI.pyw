@@ -16,7 +16,7 @@ class inputwindow(tk.Frame):
     def createWidgets(self):
         #Skapa en knapp som kallar på return_values när den trycks på.
         self.acceptButton = tk.Button(self,text=buttondefault,
-            command=self.return_values)
+            command=self.run_histogramifiera)
         self.acceptButton.grid()
         #Skapa ett textfält för sökvägen
         self.entryfield = tk.Entry()
@@ -43,11 +43,38 @@ class inputwindow(tk.Frame):
         dologplot = self.dolog.get()
         self.quit()
 
+    def run_histogramifiera(self):
+        sokvag=self.entryfield.get()
+        maxmassa=self.massfield.get()
+        gorlogplot=self.dolog.get()
+
+        #Byt ut \ mot \\ så att de kommer att tolkas korrekt av histogramifiera.pyw.
+        sokvag.replace("\\","\\\\")
+
+        #Testa att läsa in maxmassan till en int, funkar det inte anges ingen maxmassa, annars skickas den med "-m".
+        if(maxmassa != ""):
+            try:
+                maxmassa = "-m "+str(int(maxmassa))
+            except:
+                maxmassa = ""
+
+        #Om en sökväg inte är angiven, skicka nuvarande plats med "-p".
+        if(sokvag=="" or sokvag==pathdefault):
+            sokvag=os.path.dirname(os.path.realpath(__file__))
+
+        #Om logplot är 1, lägg till "-l" som kommando.
+        logstring=""
+        if(gorlogplot):
+            logstring = " -l"
+
+        os.system("histogramifiera.pyw"+" -p \""+sokvag+"\" "+maxmassa+logstring+">log.txt")
+
+
 #Startar upp det lilla inputfönstret.
 pathwindow=inputwindow()
 pathwindow.master.title("Ange alternativ.")
 pathwindow.mainloop()
-
+'''
 #När vi kommit hit är fönstret dött och vi fortsätter som en vanlig scipt.
 
 #Byt ut \ mot \\ så att de kommer att tolkas korrekt av histogramifiera.pyw.
@@ -74,3 +101,4 @@ if(dologplot):
     logstring = " -l"
 
 os.system("histogramifiera.pyw"+" -p \""+pathstring+"\" "+massstring+logstring+">log.txt")
+'''
