@@ -1,10 +1,26 @@
 import sys
 import subprocess
-import time as t
+import ctypes
+import os
 
 dependecies=["scipy","numpy","matplotlib"]
 installerat=[]
 wait=10
+
+def is_admin():
+	try:
+		return ctypes.windll.shell32.IsUserAnAdmin()
+	except:
+		return False
+
+if(int(sys.hexversion) < 50791408):
+	print("En uppdaterad version av python 3 behövs. Den kan laddas ned från www.python.org.")
+	os.system("pause")
+	exit()
+
+if(not is_admin()):
+	ctypes.windll.shell32.ShellExecuteW(None,"runas",sys.executable,__file__,None,1)
+	exit()
 
 if(__name__=='__main__'):
 	#Hoppas pip finns...
@@ -32,5 +48,4 @@ if(__name__=='__main__'):
 else:
 	print("Något gick fel...")
 
-print("Du kan stänga detta fönster. Det stängs av sig självt om "+str(wait)+" sekunder.")
-t.sleep(wait)
+os.system("pause")
