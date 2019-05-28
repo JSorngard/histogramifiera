@@ -3,6 +3,8 @@ import numpy as np #Behövs för generering av logaritmiska plottar
 from matplotlib import pyplot as plt #Behövs för plottning
 import argparse #Behövs för att läsa in kommandon från kommandotolken/powershell.
 import ctypes  #Behövs för att ge en ruta med felmeddelanden.
+import tkinter as tk #Behövs för GUI input.
+#from tkinter import *
 
 #-------------------HÅRDKODADE ALTERNATIV------------------------------------------
 minval=0     #Datavärden under detta ignoreras.
@@ -58,9 +60,12 @@ if(maxval<0):
 
 debug=args["debugging"]
 
+
 mydir=args["path"]
 
 shell=args["shell"]
+
+#-------------------------------------------------------------------------------
 
 if(not os.path.isdir(mydir)):
     fel("Den angivna sökvägen är inte giltig. Angiven sökväg: \'"+mydir+"\'.")
@@ -72,7 +77,6 @@ if(debug):
     print("Kommandoradsalternativ är inlästa:")
     print("    stapelfaktor: "+str(binfactor)+", logplot: "+str(loghist)+", maxmassa: "+str(maxval)+".\n")
     
-#-------------------------------------------------------------------------------
 
 if(debug):
     print("Letar efter txt-filer i "+mydir+"...")
