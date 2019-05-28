@@ -1,3 +1,5 @@
+#Kodade av Johan Sörngård för Vetenskapens hus.
+
 import tkinter as tk
 import os
 

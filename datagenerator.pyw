@@ -1,3 +1,5 @@
+#Kodade av Johan Sörngård för Vetenskapens hus.
+
 import random #Behövs för att slumpa tal.
 import os #Behövs för at skria och läsa filer.
 import numpy as np #Behövs för diverse matte.

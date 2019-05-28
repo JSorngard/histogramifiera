@@ -1,3 +1,5 @@
+#Kodade av Johan Sörngård för Vetenskapens hus.
+
 import sys
 import subprocess
 import ctypes

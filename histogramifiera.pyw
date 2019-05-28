@@ -1,4 +1,6 @@
-﻿import os #Behövs för filinläsning
+﻿#Kodade av Johan Sörngård för Vetenskapens hus.
+
+import os #Behövs för filinläsning
 import numpy as np #Behövs för generering av logaritmiska plottar
 from matplotlib import pyplot as plt #Behövs för plottning
 import argparse #Behövs för att läsa in kommandon från kommandotolken/powershell.
