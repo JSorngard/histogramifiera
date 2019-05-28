@@ -1,6 +1,9 @@
 import tkinter as tk
 import os
 
+pathdefault="Sökväg"
+massdefault="Maxmassa"
+
 class inputwindow(tk.Frame):
     """Ett litet fönster som läser in diverse input och lagrar den i variabler."""
     def __init__(self, master=None):
@@ -15,11 +18,11 @@ class inputwindow(tk.Frame):
         self.acceptButton.grid()
         #Skapa ett textfält för sökvägen
         self.entryfield = tk.Entry()
-        self.entryfield.insert(0,"Sökväg")
+        self.entryfield.insert(0,pathdefault)
         self.entryfield.grid()
         #Skapa ett textfält för den maximala massan.
         self.massfield = tk.Entry()
-        self.massfield.insert(0,"Maxmassa")
+        self.massfield.insert(0,massdefault)
         self.massfield.grid()
         #Placera fokus i sökvägsfältet.
         self.entryfield.focus_set()
@@ -49,4 +52,4 @@ if(massstring != ""):
 if(pathstring=="" or pathstring=="Sökväg"):
     pathstring=os.path.dirname(os.path.realpath(__file__))
 
-os.system("python histogramifiera.pyw"+" -p \""+pathstring+"\" "+massstring)
+os.system("histogramifiera.pyw"+" -p \""+pathstring+"\" "+massstring)

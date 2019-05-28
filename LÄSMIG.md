@@ -22,3 +22,6 @@ Både datagenerator.pyw och histogramifiera.pyw går att köra genom att dubbelk
 sina grundinställningar.  datagenerator.pyw lägger de genererade filerna i mappen den befinner sig i.  
 histogramifiera.pyw antar att alla .txt-filer som finns i samma mapp som den själv kommer antingen från Hypatia
 eller datagenerator.pyw, är detta inte sant kan problem uppstå.
+
+Om man vill ha ett grafiskt användargränssnitt för inmatning av alternativ kan man köra histogramifiera_GUI.pyw
+istället.
