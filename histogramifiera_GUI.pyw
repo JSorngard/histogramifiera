@@ -1,11 +1,15 @@
 #Kodades av Johan Sörngård för Vetenskapens hus.
 
+if(not __name__=="__main__"):
+    print("histogramifiera_GUI: Måste köras som huvudprogram.")
+    exit()
+
 import tkinter as tk #Behövs för GUI.
 import os #Behövs för att hitta sökvägar.
 import subprocess #Behövs för att kalla på histogramifiera.pyw
 import ctypes #Behövs för att visa rutor med felmeddelanden.
 
-#Namn på olika textelement.
+#------------Namn på olika textelement.--------------------
 pathdefault=""
 massdefault=""
 buttondefault="Histogramifiera!"
@@ -13,6 +17,7 @@ maxmassatext="Maximal massa att plotta till"
 sokvagstext="Sökväg till data"
 logplottext="Gör logaritmisk plot"
 titeltext="Ange alternativ"
+#----------------------------------------------------------
 
 #Ta fram nuvarande sökväg.
 currentpath=os.path.dirname(os.path.realpath(__file__))
@@ -73,6 +78,7 @@ class inputwindow(tk.Frame):
         self.pathfield.focus_set()
 
     def run_histogramifiera(self):
+        """Funktion som extraherar data från alla fönsterelement, bearbetar den och skickar den till histogramifiera."""
         sokvag=self.pathfield.get()
         maxmassa=self.massfield.get()
         gorlogplot=self.dolog.get()
