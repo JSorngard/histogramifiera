@@ -1,4 +1,4 @@
-﻿#Kodade av Johan Sörngård för Vetenskapens hus.
+﻿#Kodades av Johan Sörngård för Vetenskapens hus.
 
 import os #Behövs för filinläsning
 import numpy as np #Behövs för generering av logaritmiska plottar

@@ -1,17 +1,20 @@
 #Kodades av Johan Sörngård för Vetenskapens hus.
 
-import tkinter as tk
-import os
-import subprocess
-import ctypes
+import tkinter as tk #Behövs för GUI.
+import os #Behövs för att hitta sökvägar.
+import subprocess #Behövs för att kalla på histogramifiera.pyw
+import ctypes #Behövs för att visa rutor med felmeddelanden.
 
+#Namn på olika textelement-
 pathdefault=""
 massdefault=""
 buttondefault="Histogramifiera!"
 maxmassatext="Maximal massa att plotta till"
-sokvagstext="Sökväg"
-logplottext="Logplot"
+sokvagstext="Sökväg till data"
+logplottext="Gör logaritmisk plot"
 titeltext="Ange alternativ"
+
+#Ta fram nuvarande sökväg.
 currentpath=os.path.dirname(os.path.realpath(__file__))
 
 class inputwindow(tk.Frame):
@@ -49,8 +52,14 @@ class inputwindow(tk.Frame):
 
         #Skapa och placera en kryssruta för om man vill göra en logplot.
         self.dolog = tk.IntVar()
-        self.logcheck = tk.Checkbutton(text=logplottext,variable=self.dolog)
-        self.logcheck.grid(row=2,column=0)
+        self.logcheck = tk.Checkbutton(variable=self.dolog)
+        self.logcheck.grid(row=2,column=1)
+
+        #Placera en förklarande text bredvid.
+        self.loglabeltext = tk.StringVar()
+        self.loglabeltext.set(logplottext)
+        self.loglabel = tk.Label(textvariable=self.loglabeltext)
+        self.loglabel.grid(row=2,column=0)
 
         #Skapa en knapp som kallar på run_histogramifiera när den trycks på.
         self.gobutton = tk.Button(text=buttondefault,command=self.run_histogramifiera)
@@ -92,7 +101,7 @@ class inputwindow(tk.Frame):
         if(gorlogplot):
             logstring = " -l"
 
-        log=subprocess.check_output("python histogramifiera.pyw"+" -p \""+sokvag+"\" "+maxmassa+logstring)
+        log=subprocess.check_output("pythonw histogramifiera.pyw"+" -p \""+sokvag+"\" "+maxmassa+logstring)
         logfil=open("log.txt","w")
         logfil.write(str(log))
         logfil.close()
@@ -101,5 +110,6 @@ class inputwindow(tk.Frame):
 #Startar upp det lilla inputfönstret.
 root=tk.Tk()
 root.title(titeltext)
+root.iconbitmap("kugghjul.ico")
 program=inputwindow(master=root)
 program.mainloop()
