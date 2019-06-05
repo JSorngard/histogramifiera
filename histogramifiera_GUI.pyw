@@ -5,7 +5,7 @@ import os #Behövs för att hitta sökvägar.
 import subprocess #Behövs för att kalla på histogramifiera.pyw
 import ctypes #Behövs för att visa rutor med felmeddelanden.
 
-#Namn på olika textelement-
+#Namn på olika textelement.
 pathdefault=""
 massdefault=""
 buttondefault="Histogramifiera!"
@@ -16,6 +16,10 @@ titeltext="Ange alternativ"
 
 #Ta fram nuvarande sökväg.
 currentpath=os.path.dirname(os.path.realpath(__file__))
+
+def fel(meddelande):
+    """Funktion som tar emot en sträng och öppnar ett fönster med den stängen i."""
+    ctypes.windll.user32.MessageBoxW(0,meddelande,"Fel", 1)
 
 class inputwindow(tk.Frame):
     """Ett litet fönster som läser in diverse input och skicakr den vidare till histogramifiera."""
@@ -29,15 +33,15 @@ class inputwindow(tk.Frame):
     def createWidgets(self):
         
         #Skapa ett textfält för sökvägen
-        self.pathfield = tk.Entry()
-        self.pathfield.insert(0,pathdefault)
-        self.pathfield.grid(row=0,column=1)
+        self.pathfield = tk.Entry() #Skapa fältet.
+        self.pathfield.insert(0,pathdefault) #Stoppa in defaulttexten.
+        self.pathfield.grid(row=0,column=1) #Placera det i fönstret.
 
         #Placera förklarande text bredvid
-        self.pathlabeltext = tk.StringVar()
-        self.pathlabeltext.set(sokvagstext)
-        self.pathlabel = tk.Label(textvariable=self.pathlabeltext)
-        self.pathlabel.grid(row=0,column=0)
+        self.pathlabeltext = tk.StringVar() #Skapa en sträng.
+        self.pathlabeltext.set(sokvagstext) #Sätt strängen till defaulttexten.
+        self.pathlabel = tk.Label(textvariable=self.pathlabeltext) #Skapa en etikett.
+        self.pathlabel.grid(row=0,column=0) #Sätt texten på etiketten till den nyligen skapade strängen.
 
         #Skapa ett textfält för den maximala massan.
         self.massfield = tk.Entry()
@@ -51,9 +55,9 @@ class inputwindow(tk.Frame):
         self.masslabel.grid(row=1,column=0)
 
         #Skapa och placera en kryssruta för om man vill göra en logplot.
-        self.dolog = tk.IntVar()
-        self.logcheck = tk.Checkbutton(variable=self.dolog)
-        self.logcheck.grid(row=2,column=1)
+        self.dolog = tk.IntVar() #Skapa en integer.
+        self.logcheck = tk.Checkbutton(variable=self.dolog) #Skapa en kryssruta som lagrar resultatet i den nyligen skapade integern.
+        self.logcheck.grid(row=2,column=1) #Placera kryssrutan i fönstret.
 
         #Placera en förklarande text bredvid.
         self.loglabeltext = tk.StringVar()
@@ -64,12 +68,6 @@ class inputwindow(tk.Frame):
         #Skapa en knapp som kallar på run_histogramifiera när den trycks på.
         self.gobutton = tk.Button(text=buttondefault,command=self.run_histogramifiera)
         self.gobutton.grid(row=3,column=1)
-
-        #Gör så att även tomma rader och kolonner tar plats.
-        #for i in range(2):
-        #    self.columnconfigure(i,weight=1)
-        #for i in range(3):
-        #    self.rowconfigure(i,weight=1)
 
         #Placera fokus i sökvägsfältet.
         self.pathfield.focus_set()
@@ -87,7 +85,7 @@ class inputwindow(tk.Frame):
             try:
                 maxmassa = "-m "+str(int(maxmassa))
             except:
-                ctypes.windll.user32.MessageBoxW(0,"Ogiltig maxmassa", "Fel", 1)
+                fel("Ogiltig maxmassa")
                 return
         else:
             maxmassa = ""
@@ -107,9 +105,15 @@ class inputwindow(tk.Frame):
         logfil.close()
         #os.system("histogramifiera.pyw"+" -p \""+sokvag+"\" "+maxmassa+logstring+">log.txt")
 
-#Startar upp det lilla inputfönstret.
+#------------Startar upp det lilla inputfönstret-----------
 root=tk.Tk()
-root.title(titeltext)
-root.iconbitmap("kugghjul.ico")
-program=inputwindow(master=root)
-program.mainloop()
+root.title(titeltext) #Ange fönstrets titel.
+try:
+    #Försök sätta fönsterikonen till kugghjul.ico.
+    root.iconbitmap("kugghjul.ico")
+except:
+    #Finns den inte så strunta i det.
+    pass
+program=inputwindow(master=root) #Lägg in alla funktioner definierade i inputwindow.
+program.mainloop() #Starta fönstret.
+#----------------------------------------------------------
