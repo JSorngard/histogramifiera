@@ -19,7 +19,12 @@ bintext="Binfaktor"
 sokvagstext="Sökväg till data"
 logplottext="Gör logaritmisk plot"
 titeltext="Ange alternativ"
-debugtext="Debug"
+debugtext="Debuginfo till loggen"
+#----------------------------------------------------------
+
+#------------------Programalternativ-----------------------
+width=300 #Bredd på fönstret i pixlar.
+height=114 #Höjd på fönstret i pixlar.
 #----------------------------------------------------------
 
 #Ta fram nuvarande sökväg.
@@ -154,8 +159,8 @@ class inputwindow(tk.Frame):
 #------------Startar upp det lilla inputfönstret-----------
 root=tk.Tk() #Skapa ett fönsterobjekt.
 root.title(titeltext) #Ange fönstrets titel.
-root.geometry("300x114")
-root.minsize(width=300,height=114) #Gör så att fönstret inte går att förminska under en minimistorlek.
+root.geometry(str(width)+"x"+str(height))
+root.minsize(width=width,height=height) #Gör så att fönstret inte går att förminska under en minimistorlek.
 try:
     #Försök sätta fönsterikonen till kugghjul.ico.
     root.iconbitmap("kugghjul.ico")
