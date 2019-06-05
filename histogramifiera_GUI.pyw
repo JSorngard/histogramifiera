@@ -89,7 +89,7 @@ class inputwindow(tk.Frame):
         self.gobutton.grid(row=5,column=1)
 
         #---Denna ruta och dess text placeras ovanför fönstret. Man måste förstora det för att se.
-        #Skapa och placera en kryssruta för om man vill skriva debug information till loggen.
+        #Skapa och placera en kryssruta för om man vill skriva debuginformation till loggen.
         self.dodebug = tk.IntVar()
         self.debugcheck = tk.Checkbutton(variable=self.dodebug)
         self.debugcheck.grid(row=0,column=1)
@@ -100,7 +100,7 @@ class inputwindow(tk.Frame):
         self.debuglabel = tk.Label(textvariable=self.debuglabeltext)
         self.debuglabel.grid(row=0,column=0)
         #---
-        
+
         #Placera fokus i sökvägsfältet.
         self.pathfield.focus_set()
 
