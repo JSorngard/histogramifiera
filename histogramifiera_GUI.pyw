@@ -154,8 +154,8 @@ class inputwindow(tk.Frame):
 #------------Startar upp det lilla inputfönstret-----------
 root=tk.Tk() #Skapa ett fönsterobjekt.
 root.title(titeltext) #Ange fönstrets titel.
-root.geometry("300x112")
-root.minsize(width=300,height=112) #Gör så att fönstret inte går att förminska under en minimistorlek.
+root.geometry("300x114")
+root.minsize(width=300,height=114) #Gör så att fönstret inte går att förminska under en minimistorlek.
 try:
     #Försök sätta fönsterikonen till kugghjul.ico.
     root.iconbitmap("kugghjul.ico")
