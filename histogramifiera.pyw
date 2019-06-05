@@ -90,7 +90,7 @@ for file in os.listdir(mydir):
     
 #Om det inte hittades några .txt-filer så avslutar programmet sig självt.
 if(len(files)==0):
-    fel("Hittade inga txt-filer. Placera programmet i, eller ange via kommandorad, en sökväg till en mapp med txt-filer genererade av Hypatia. Använde sökvägen: \'"+mydir+"\'.")
+    fel("Hittade inga txt-filer. Placera programmet i, eller ange via kommandorad eller GUI, en sökväg till en mapp med txt-filer genererade av Hypatia. Använde sökvägen: \'"+mydir+"\'.")
     exit()
 elif(debug):
     print("Hittade "+str(len(files))+" stycken.\n")
