@@ -159,6 +159,7 @@ class inputwindow(tk.Frame):
             logfil.close()
 	        #os.system("histogramifiera.pyw"+" -p \""+sokvag+"\" "+maxmassa+logstring+">log.txt")
         else:
+            #Starta en tråd som tar hand om histogramfönstret.
             plotthread = threading.Thread(target=self.run_histogramifiera,args=(sokvag,maxmassa,logstring,binfactor,debugstring))
             plotthread.start()    
 
