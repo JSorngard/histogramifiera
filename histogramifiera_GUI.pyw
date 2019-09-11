@@ -8,6 +8,7 @@ import tkinter as tk #Behövs för GUI.
 import os #Behövs för att hitta sökvägar.
 import subprocess #Behövs för att kalla på histogramifiera.pyw
 import ctypes #Behövs för att visa rutor med felmeddelanden.
+import threading
 
 #------------Namn på olika textelement.--------------------
 pathdefault=""
@@ -89,8 +90,8 @@ class inputwindow(tk.Frame):
         self.loglabel = tk.Label(textvariable=self.loglabeltext)
         self.loglabel.grid(row=4,column=0)
 
-        #Skapa en knapp som kallar på run_histogramifiera när den trycks på.
-        self.gobutton = tk.Button(text=buttondefault,command=self.run_histogramifiera)
+        #Skapa en knapp som kallar på prepare_histogramifiera när den trycks på.
+        self.gobutton = tk.Button(text=buttondefault,command=self.prepare_histogramifiera)
         self.gobutton.grid(row=5,column=1)
 
         #---Denna ruta och dess text placeras ovanför fönstret. Man måste förstora det för att se.
@@ -109,7 +110,10 @@ class inputwindow(tk.Frame):
         #Placera fokus i sökvägsfältet.
         self.pathfield.focus_set()
 
-    def run_histogramifiera(self):
+    def run_histogramifiera(self,sokvag,maxmassa,logstring,binfactor,debugstring):
+        subprocess.call("pythonw histogramifiera.pyw"+" -p \""+sokvag+"\""+maxmassa+logstring+binfactor+debugstring)
+
+    def prepare_histogramifiera(self):
         """Funktion som extraherar data från alla fönsterelement, bearbetar den och skickar den till histogramifiera."""
         sokvag=self.pathfield.get()
         maxmassa=self.massfield.get()
@@ -148,13 +152,16 @@ class inputwindow(tk.Frame):
         debugstring=""
         if(debugging):
             debugstring=" -d"
+            log=subprocess.check_output("pythonw histogramifiera.pyw"+" -p \""+sokvag+"\""+maxmassa+logstring+binfactor+debugstring)
+            output=log.decode('utf-8')
+            logfil=open("log.txt","w")
+            logfil.write(output)
+            logfil.close()
+	        #os.system("histogramifiera.pyw"+" -p \""+sokvag+"\" "+maxmassa+logstring+">log.txt")
+        else:
+            plotthread = threading.Thread(target=self.run_histogramifiera,args=(sokvag,maxmassa,logstring,binfactor,debugstring))
+            plotthread.start()    
 
-        log=subprocess.check_output("pythonw histogramifiera.pyw"+" -p \""+sokvag+"\""+maxmassa+logstring+binfactor+debugstring)
-        output=log.decode('utf-8')
-        logfil=open("log.txt","w")
-        logfil.write(output)
-        logfil.close()
-        #os.system("histogramifiera.pyw"+" -p \""+sokvag+"\" "+maxmassa+logstring+">log.txt")
 
 #------------Startar upp det lilla inputfönstret-----------
 root=tk.Tk() #Skapa ett fönsterobjekt.

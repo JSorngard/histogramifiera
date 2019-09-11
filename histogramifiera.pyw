@@ -175,4 +175,5 @@ plt.xlabel("Invariant massa [GeV/c^2]")
 plt.ylabel("Antal händelser")
 
 #Visa resultatet.
+#plt.ion()
 plt.show()
