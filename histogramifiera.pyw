@@ -1,179 +1,317 @@
-﻿#Kodades av Johan Sörngård för Vetenskapens hus.
+#Kodades av Johan Sörngård för Vetenskapens hus.
 
-import os #Behövs för filinläsning
-import numpy as np #Behövs för generering av logaritmiska plottar
+if not __name__=="__main__":
+    print("histogramifiera måste köras som huvudprogram.")
+    exit()
+
+import tkinter as tk #Behövs för GUI.
+import os #Behövs för att hitta sökvägar.
+import ctypes #Behövs för att visa rutor med felmeddelanden.
+import numpy as np #Behövs för generering av logaritmiska plottar.
 from matplotlib import pyplot as plt #Behövs för plottning
-import argparse #Behövs för att läsa in kommandon från kommandotolken/powershell.
-import ctypes  #Behövs för att ge en ruta med felmeddelanden.
-import tkinter as tk #Behövs för GUI input.
-#from tkinter import *
 
-#-------------------HÅRDKODADE ALTERNATIV------------------------------------------
-minval=0     #Datavärden under detta ignoreras.
-shell=False   #Anger ifall programmet körs via kommandotolken/powershell.
+#------------Namn på olika textelement.--------------------
+pathdefault=""
+massdefault=""
+bindefault="1"
+buttondefault="Histogramifiera!"
+maxmassatext="Maximal massa att plotta till"
+bintext="Binfaktor"
+sokvagstext="Sökväg till data"
+logplottext="Gör logaritmisk plot"
+titeltext="Ange alternativ"
+debugtext="Debuginfo till loggen"
+#----------------------------------------------------------
+
+#------------------Programalternativ-----------------------
+width=300 #Bredd på fönstret i pixlar.
+height=114 #Höjd på fönstret i pixlar.
+#----------------------------------------------------------
+
+#-------------------HÅRDKODADE ALTERNATIV------------------
+min_massa=0     #Datavärden under detta ignoreras.
 pile=['e','m','4ee','4mm','4me',' '] #En hög med skräp som ska rensas bort ur alla txt-filer. Placera ' ' sist.
-#----------------------------------------------------------------------------------
+#----------------------------------------------------------
 
-#Ta fram vilken mapp vi befinner oss i.
-mydir=os.path.dirname(os.path.realpath(__file__))
+#Ta fram nuvarande sökväg.
+current_path=os.path.dirname(os.path.realpath(__file__))
 
-#Initiera variabler.
-files=[]
-data=np.array([])
-
-#Skriver ut felmeddelanden på rätt sätt beroende på programanvändning.
 def fel(meddelande):
-    if(not shell):
-        ctypes.windll.user32.MessageBoxW(0,meddelande, "Fel", 1)
-    else:
-        print(meddelande)
+    """Funktion som tar emot en sträng och öppnar ett fönster med den stängen i."""
+    ctypes.windll.user32.MessageBoxW(0,meddelande,"Fel", 1)
 
-#--------------------Lägg till lyssning efter extrakommandon.-------------------
-#--------------Endast relevant om programmet körs via kommandotolken.-----------
-#-------------------------------------------------------------------------------
+class inputwindow(tk.Frame):
+    """Ett litet fönster som läser in diverse input och skicakr den vidare till histogramifiera."""
+    def __init__(self, master=None):
+        tk.Frame.__init__(self,master)
+        self.grid(sticky="news")
+        master.rowconfigure(0,weight=1)
+        master.columnconfigure(0,weight=1)
+        self.createWidgets()
 
-#Skapa objektet som lyssnar efter kommandon.
-parser=argparse.ArgumentParser(description='Genererar histogram av invarianta massor lagrade i de txt-filer som skapas av Hypatia. Placera denna fil och alla txt-filer du vill analysera i samma mapp och kör sedan programmet. Körs programmet via kommandotolken kan du istället ange sökvägen till mappen med txt-filerna.')
+    def createWidgets(self):
+        
+        #Skapa ett textfält för sökvägen
+        self.pathfield = tk.Entry() #Skapa fältet.
+        self.pathfield.insert(0,pathdefault) #Stoppa in defaulttexten.
+        self.pathfield.grid(row=1,column=1) #Placera det i fönstret.
 
-#Definiera de möjliga argumenten.
-parser.add_argument("-l","--logplot",required=False,dest="loghist",action="store_true",help="Inkludera detta kommando om du vill ha en logaritmisk plot.")
-parser.add_argument("-n","--no-logplot",required=False,dest="loghist",action="store_false",help="Inkludera detta kommando om du vill ha en linjär plot. Om inget annat anges körs detta som standard.")
-parser.add_argument("-b","--binmult",required=False,default=1.,type=float,help="Multiplicerar antalet staplar med denna faktor. Om inget annat anges är den 1. Antalet staplar beräknas som roten ur mängden datapunkter.")
-parser.add_argument("-m","--maxmass",required=False,default=0,type=int,help="Filtrerar ut datapunkter med invarianta massor högre än detta värde. Om inget värde anges ignoreras denna gräns.")
-parser.add_argument("-p","--path",required=False,default=mydir,type=str,help="Ange detta kommando följt av sökvägen till mappen du vill läsa txt-filer i. Anges inte detta kommando används mappen programfilen befinner sig i.")
-parser.add_argument("-s","--shell",required=False,action="store_true",help="Detta kommando kan anges för att få programmet att skriva ut felmeddelanden till std::out istället för att skapa nya småfönster. Användbart om programmet körs via kommandotolken eller powershell.")
-parser.add_argument("-d","--debug",required=False,dest="debugging",action="store_true",help="Ange detta kommando om du vill få ut extrautskrifter från programmet.")
+        #Placera förklarande text bredvid
+        self.pathlabeltext = tk.StringVar() #Skapa en sträng.
+        self.pathlabeltext.set(sokvagstext) #Sätt strängen till defaulttexten.
+        self.pathlabel = tk.Label(textvariable=self.pathlabeltext) #Skapa en etikett.
+        self.pathlabel.grid(row=1,column=0) #Sätt texten på etiketten till den nyligen skapade strängen.
 
-#Läs in värdet hos de definierade argumenten.
-args=vars(parser.parse_args())
+        #Skapa ett textfält för den maximala massan.
+        self.massfield = tk.Entry()
+        self.massfield.insert(0,massdefault)
+        self.massfield.grid(row=2,column=1)
 
-#Extrahera deras värden till relevanta variabler och se till att de är okej.
-binfactor=args["binmult"]
-if(binfactor<0):
-    print("Antalet staplar kan endast multipliceras med ett positivt tal. Byter tecken på "+str(binfactor)+".")
-    binfactor*=-1
+        #Placera förklarande text bredvid.
+        self.masslabeltext = tk.StringVar()
+        self.masslabeltext.set(maxmassatext)
+        self.masslabel = tk.Label(textvariable=self.masslabeltext)
+        self.masslabel.grid(row=2,column=0)
 
-loghist=args["loghist"]
+        #Skapa ett textfält för att läsa in en binfaktor.
+        self.binfield = tk.Entry()
+        self.binfield.insert(0,bindefault)
+        self.binfield.grid(row=3,column=1)
 
-maxval=args["maxmass"]
-if(maxval<0):
-    print("Maxmassan måste vara positiv. Byter tecken på "+str(maxval)+".")
-    maxval*=-1
+        #Placera förklarande text bredvid.
+        self.binlabeltext = tk.StringVar()
+        self.binlabeltext.set(bintext)
+        self.binlabel = tk.Label(textvariable=self.binlabeltext)
+        self.binlabel.grid(row=3,column=0)
 
-debug=args["debugging"]
+        #Skapa och placera en kryssruta för om man vill göra en logplot.
+        self.dolog = tk.IntVar() #Skapa en integer.
+        self.logcheck = tk.Checkbutton(variable=self.dolog) #Skapa en kryssruta som lagrar resultatet i den nyligen skapade integern.
+        self.logcheck.grid(row=4,column=1) #Placera kryssrutan i fönstret.
+
+        #Placera en förklarande text bredvid.
+        self.loglabeltext = tk.StringVar()
+        self.loglabeltext.set(logplottext)
+        self.loglabel = tk.Label(textvariable=self.loglabeltext)
+        self.loglabel.grid(row=4,column=0)
+
+        #Skapa en knapp som kallar på prepare_histogramifiera när den trycks på.
+        self.gobutton = tk.Button(text=buttondefault,command=self.prepare_histogramifiera)
+        self.gobutton.grid(row=5,column=1)
+
+        #---Denna ruta och dess text placeras ovanför fönstret. Man måste förstora det för att se.
+        #Skapa och placera en kryssruta för om man vill skriva debuginformation till loggen.
+        self.dodebug = tk.IntVar()
+        self.debugcheck = tk.Checkbutton(variable=self.dodebug)
+        self.debugcheck.grid(row=0,column=1)
+
+        #Placera en förklarande text bredvid.
+        self.debuglabeltext = tk.StringVar()
+        self.debuglabeltext.set(debugtext)
+        self.debuglabel = tk.Label(textvariable=self.debuglabeltext)
+        self.debuglabel.grid(row=0,column=0)
+        #---
+
+        #Placera fokus i sökvägsfältet.
+        self.pathfield.focus_set()
+
+    def histogramifiera(self,sokvag,max_massa,log_plot,binfaktor,debug):
+        """
+        Läser in all data i txt-filer genererade av Hypatia. Rensar dem på skräp
+        och plottar sedan datan som ett histogram.
+        """
 
 
-mydir=args["path"]
+        if not os.path.isdir(sokvag):
+            fel("Den angivna sökvägen är inte giltig. Angiven sökväg: \'"+sokvag+"\'.")
+            return
 
-shell=args["shell"]
+        #Alla 'if debug ' utförs endast om den lilla debugrutan är ikryssad.
+        if debug:
+            #Skapa en logfil.
+            log=open("histogramifiera_log.txt","w")
+            log.write("DEBUG-läge aktiverat, fler utskrifter följer.\n")
+            log.write("Stapelfaktor: "+str(binfaktor)+", logplot?: "+str(log_plot)+", maximal massa: "+str(max_massa)+".\n")
+            
 
-#-------------------------------------------------------------------------------
+        if debug:
+            log.write("Letar efter txt-filer i "+sokvag+"...\n")
 
-if(not os.path.isdir(mydir)):
-    fel("Den angivna sökvägen är inte giltig. Angiven sökväg: \'"+mydir+"\'.")
-    exit()
+        #Generera en lista över den kompletta sökvägen till alla txt-filer i den nuvarande mappen.
+        files=[]
+        for file in os.listdir(sokvag):
+            if file.endswith(".txt"):
+                files.append(os.path.join(sokvag, file))
+            
+        #Om det inte hittades några txt-filer så avslutar programmet sig självt.
+        if len(files)==0:
+            fel("Hittade inga txt-filer. Placera programmet i, eller ange via kommandorad eller GUI, en sökväg till en mapp med txt-filer genererade av Hypatia. Använde sökvägen: \'"+sokvag+"\'.")
+            return
+        elif debug:
+            log.write("Hittade "+str(len(files))+" stycken.\n")
 
-#Alla 'if(debug)' utförs endast om kommandoradsalternativet -d är angett.
-if(debug):
-    print("\nDEBUG-läge aktiverat, fler utskrifter följer.\n")
-    print("Kommandoradsalternativ är inlästa:")
-    print("    stapelfaktor: "+str(binfactor)+", logplot: "+str(loghist)+", maxmassa: "+str(maxval)+".\n")
-    
+        #En plats att lägga all data på.
+        data=np.array([])
 
-if(debug):
-    print("Letar efter txt-filer i "+mydir+"...")
+        #För varje sådan txt-fil vi hittade
+        for fil in files:
 
-#Generera en lista över den kompletta sökvägen till alla .txt-filer i den nuvarande mappen.
-for file in os.listdir(mydir):
-    if file.endswith(".txt"):
-        files.append(os.path.join(mydir, file))
-    
-#Om det inte hittades några .txt-filer så avslutar programmet sig självt.
-if(len(files)==0):
-    fel("Hittade inga txt-filer. Placera programmet i, eller ange via kommandorad eller GUI, en sökväg till en mapp med txt-filer genererade av Hypatia. Använde sökvägen: \'"+mydir+"\'.")
-    exit()
-elif(debug):
-    print("Hittade "+str(len(files))+" stycken.\n")
 
-#För varje sådan .txt-fil vi hittade
-for fil in files:
-    if(debug):
-        print("Bearbetar "+str(fil)+"...")
-              
-    #Så öppnar vi den.
-    with open(fil,'r') as myfile:
-        if(debug):
-            print(" öppnade")
-        #Och läser in dess innehåll.
-        contents=myfile.read()
-        if(debug):
-            print("  läste in innehållet")
+            if debug:
+                log.write("Bearbetar "+str(fil)+"...\n")
+            
+            #Ifall fil inte har fler än 23 tecken i sitt namn
+            #så ligger denna bit i ett tryblock.
+            try:
+                if fil[-23:] == "histogramifiera_log.txt":
+                    if debug:
+                        log.write(" det var loggen, skippa den.\n")
+                    continue
+            except:
+                #Det var inte loggen då den garanterat har åtminståne 23 tecken,
+                #så vi ignorerar felet.
+                pass
 
-    #Sedan tar vi bort alla 'e', 'm', '4ee', '4mm', '4me' och ' '.
-    for trash in pile:
-        contents=contents.replace(trash,"")
-    #contents=contents.replace("4ee","").replace("4me","").replace("4mm","").replace("e","").replace("m","").replace(" ","")
-    
-    #Och delar upp filen efter radbrytningar.
-    contents=contents.split("\n")
+            #Så öppnar vi den.
+            with open(fil,'r') as nuvarande_fil:
+                if debug:
+                    log.write(" öppnade\n")
+                #Och läser in dess innehåll.
+                contents=nuvarande_fil.read()
+                if debug:
+                    log.write("  läste in innehållet\n")
 
-    #Sedan filtrerar vi ut alla rader som inte är någonting.
-    contents=list(filter(lambda x: x!='',contents))
 
-    #Och försöker omvandla allt kvarvarande innehåll till flyttal.
-    try:
-        contents=[float(entry) for entry in contents]
-    except:
-    	#Funkar det inte så antar vi att filen inte skapades av Hypatia och går vidare till nästa.
-        if(debug):
-        	print("    inte en Hypatiafil. Skippar till nästa.")
-        continue
-    
-    if(debug):
-        print("    rensade datan")
+            #Sedan tar vi bort alla 'e', 'm', '4ee', '4mm', '4me' och ' '.
+            for trash in pile:
+                contents=contents.replace(trash,"")
+            
+            #Och delar upp filen efter radbrytningar.
+            contents=contents.split("\n")
 
-    if(debug):
-        print("     konverterade datan till flyttal\n")
-    
-    #Sedan lägger vi in den resulterande arrayen av siffror i slutet av 'data'.
-    data=np.append(data,np.array(contents))
-    
-#Filtrera ut datapunkter större än maxval (om angett) och mindre än minval.
-if(maxval!=0):
-    data=np.array(list(filter(lambda x: x>minval and x<maxval,data)))
-else:
-    data=np.array(list(filter(lambda x: x>minval,data)))
+            #Sedan filtrerar vi ut alla rader som inte är någonting.
+            contents=list(filter(lambda x: x!='',contents))
 
-if(debug and maxval==0):
-    print("Filtrerade ut för små massor.")
-elif(debug):
-    print("Filtrerade ut för små och för stora massor.")
+            if debug:
+                log.write("    rensade datan\n")
 
-#Beräkna antalet staplar.
-sig=int(round(binfactor*np.sqrt(len(data))))
+            #Och försöker omvandla allt kvarvarande innehåll till flyttal.
+            try:
+                contents=[float(entry) for entry in contents]
+            except:
+                #Funkar det inte så antar vi att filen inte skapades av Hypatia och går vidare till nästa.
+                if debug:
+                    log.write("    inte en Hypatiafil. Skippar till nästa.\n")
+                continue
+            
+            if debug:
+                log.write("     konverterade datan till flyttal\n")
+            
+            #Sedan lägger vi in den resulterande arrayen av siffror i slutet av 'data'.
+            data=np.append(data,np.array(contents))
+            
+        #Filtrera ut datapunkter större än max_massa (om angett) och mindre än min_massa.
+        if max_massa!=0:
+            data=np.array(list(filter(lambda x: x > min_massa and x < max_massa,data)))
+        else:
+            data=np.array(list(filter(lambda x: x > min_massa,data)))
 
-#Om vi vill göra en logplot så måste staplarna skalas korrekt.
-if(loghist):
-    bins=np.logspace(np.log10(min(data)),np.log10(max(data)),sig)
-else:
-    bins=sig
-    
-if(debug):
-    print("Plottar...\n")
-    
-#Plotta histogrammet...
-plt.hist(data,bins=bins)
+        if debug and max_massa==0:
+            log.write("Filtrerade ut för små massor.\n")
+        elif debug:
+            log.write("Filtrerade ut för små och för stora massor.\n")
 
-#och sätt x-axeln till logaritmisk om vi gör en logplot.
-if(loghist):
-    plt.gca().set_xscale("log")
-else:
-    plt.gca().set_xscale("linear")
+        #Beräkna antalet staplar.
+        sig=int(round(binfaktor*np.sqrt(len(data))))
 
-#Plotinställningar
-plt.xlabel("Invariant massa [GeV/c^2]")
-plt.ylabel("Antal händelser")
+        #Om vi vill göra en logplot så måste staplarna skalas korrekt.
+        if log_plot:
+            bins=np.logspace(np.log10(min(data)),np.log10(max(data)),sig)
+        else:
+            bins=sig
+            
+        if debug:
+            log.write("Plottar...\n")
+            
+        #Rensa vad som redan kan tänkas finnas i fönstret.
+        plt.clf()
 
-#Visa resultatet.
-#plt.ion()
-plt.show()
+        #Plotta histogrammet...
+        plt.hist(data,bins=bins)
+
+        #och sätt x-axeln till logaritmisk om vi gör en logplot.
+        if log_plot:
+            plt.gca().set_xscale("log")
+        else:
+            plt.gca().set_xscale("linear")
+
+        #Plotinställningar
+        plt.xlabel("Invariant massa [GeV/c^2]")
+        plt.ylabel("Antal händelser")
+
+        #Gör så att fönstret går att interagera med samtidigt som man ändrar på saker
+        #i inställningsfönstret.
+        plt.ion()
+
+        #Visa resultatet.
+        plt.show()
+
+        if debug:
+            log.write("Slut på loggen.")
+            log.close()
+
+    def prepare_histogramifiera(self):
+        """Funktion som extraherar data från alla fönsterelement, bearbetar den och skickar den till histogramifiera."""
+        sokvag=self.pathfield.get()
+        max_massa=self.massfield.get()
+        gorlogplot=self.dolog.get()
+        binfaktor=self.binfield.get()
+        debug=self.dodebug.get()
+
+        #Byt ut \ mot \\ så att de kommer att tolkas korrekt av histogramifiera.pyw.
+        sokvag.replace("\\","\\\\")
+
+        #Testa att läsa in maxmassan till en int, funkar det inte visas ett felmeddelande, annars skickas den med "-m".
+        if max_massa != "" and max_massa != "0":
+            try:
+                max_massa = float(max_massa)
+            except:
+                fel("Den maximala massan måste vara en siffra.")
+                return
+            if max_massa <= min_massa:
+                fel("Den maximala massan måste vara positiv.")
+                return
+        else:
+            max_massa = 0
+
+        try:
+            binfaktor=float(binfaktor)
+        except:
+            fel("Binfaktorn måste vara en siffra.")
+            return
+
+        #Om en sökväg inte är angiven, skicka nuvarande plats.
+        if sokvag=="" or sokvag==pathdefault:
+            sokvag=current_path
+
+        #Om logplot är 1, gör en logplot
+        log_plot = True if gorlogplot else False
+
+        #Histogramifiera!
+        self.histogramifiera(sokvag,max_massa,log_plot,binfaktor,debug)
+
+
+#------------Startar upp det lilla inputfönstret-----------
+root=tk.Tk() #Skapa ett fönsterobjekt.
+root.title(titeltext) #Ange fönstrets titel.
+root.geometry(str(width)+"x"+str(height))
+root.minsize(width=width,height=height) #Gör så att fönstret inte går att förminska under en minimistorlek.
+try:
+    #Försök sätta fönsterikonen till kugghjul.ico.
+    root.iconbitmap("kugghjul.ico")
+except:
+    #Finns den inte så strunta i det.
+    pass
+program=inputwindow(master=root) #Lägg in alla funktioner definierade i inputwindow.
+program.mainloop() #Starta fönstret.
+#----------------------------------------------------------
