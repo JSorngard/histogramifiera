@@ -1,1 +1,0 @@
-python -m pyinstaller --onefile -w histogramifiera.pyw
