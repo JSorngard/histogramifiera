@@ -1,4 +1,4 @@
-#Kodades av Johan Sörngård för Vetenskapens hus.
+#Kodades av Johan Sörngård under 2019 för Vetenskapens hus.
 
 if not __name__=="__main__":
     print("histogramifiera måste köras som huvudprogram.")
