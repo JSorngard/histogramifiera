@@ -1,12 +1,12 @@
-﻿**Beskrivning**  
-Histogramfifiera är ett kort pythonscript som läser txt-filer i den engivna mappen som har exporterats från
-programmet Hypatia och plottar dem i ett histogram.
+**Beskrivning**  
+Histogramifiera är en kort pythonscript som läser txt-filer som har exporterats från
+programmet Hypatia i den angivna mappen och plottar dem i ett histogram.  
 Hypatia låter en prova på att analysera riktig data från partikelkollisioner i LHC vid CERN. Orkar man inte
 sitta och generera data genom hypatia för att testa programmet kan man generera sin egen med datagenerator.pyw.
 
 **Systemkrav för att köra pythonkoden**  
 Kör man programmet via exe-filen under [releases på gihub](https://github.com/JSorngard/histogramifiera/releases) så behövs inget extra. Vill man köra pythonkoden direkt behövs:  
-- python 3.x  
+- python 3.x med modulerna:  
 - matplotlib  
 - numpy  
 *för att generera egen data behövs även*  
