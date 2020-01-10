@@ -17,7 +17,8 @@ Kör man programmet via exe-filen under [releases på gihub](https://github.com/
 - pyinstaller
 
 **Kompilering**  
-Kör kommandot "python -m PyInstaller --onefile -w histogramifiera.pyw" i en kommandotolk som befinner sig i mappen med histogramifiera.pyw. Efteråt så finns histogramifiera.exe i den nya mappen "dist".
+Kör kommandot "python -m PyInstaller --onefile -w histogramifiera.pyw" i en kommandotolk som befinner sig i mappen med histogramifiera.pyw. Efteråt så finns histogramifiera.exe i den nya mappen "dist".  
+Vill man göra en exe-fil som startar snabbar kan man skippa --onefile, men då genereras många filer som alla behövs för att programmet ska köra. I detta fall kan det vara användbart att använda sig av nsis för att komprimera alla filer och mappar i dist till en självextraherande installationsfil.
 
 **Användning**  
 datagenerator.pyw och histogramifiera.pyw går att köra genom att dubbelklicka på dem. Datagenerator.pyw lägger de genererade filerna i mappen den befinner sig i.
