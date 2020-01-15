@@ -51,7 +51,7 @@ height = 114 #Höjd på fönstret i pixlar.
 
 #-------------------HÅRDKODADE ALTERNATIV------------------
 min_massa = 0     #Datavärden under detta ignoreras.
-pile = ['e','m','4ee','4mm','4me',' '] #En hög med skräp som ska rensas bort ur alla txt-filer. Placera ' ' sist.
+pile = ['e', 'm', '4ee', '4mm', '4me', ' '] #En hög med skräp som ska rensas bort ur alla txt-filer. Placera ' ' sist.
 #----------------------------------------------------------
 
 #Ta fram nuvarande sökväg.
@@ -59,7 +59,7 @@ current_path = os.path.dirname(os.path.realpath(__file__))
 
 def fel(meddelande):
     """Funktion som tar emot en sträng och öppnar ett fönster med den strängen i."""
-    ctypes.windll.user32.MessageBoxW(0,meddelande,"Fel", 1)
+    ctypes.windll.user32.MessageBoxW(0, meddelande, "Felmeddelande", 1)
 
 class inputwindow(tk.Frame):
     """
@@ -67,11 +67,11 @@ class inputwindow(tk.Frame):
     skickar den vidare till histogramifiera.
     """
     def __init__(self, master=None):
-        tk.Frame.__init__(self,master)
+        tk.Frame.__init__(self, master)
         self.master = master
         self.grid(sticky="news")
-        master.rowconfigure(0,weight=1)
-        master.columnconfigure(0,weight=1)
+        master.rowconfigure(0, weight=1)
+        master.columnconfigure(0, weight=1)
         self.createWidgets()
 
     def createWidgets(self):
@@ -81,63 +81,63 @@ class inputwindow(tk.Frame):
         
         #Skapa ett textfält för sökvägen
         self.pathfield = ttk.Entry() #Skapa fältet.
-        self.pathfield.insert(0,pathdefault) #Stoppa in defaulttexten.
-        self.pathfield.grid(row=1,column=1) #Placera det i fönstret.
+        self.pathfield.insert(0, pathdefault) #Stoppa in defaulttexten.
+        self.pathfield.grid(row=1, column=1) #Placera det i fönstret.
 
         #Placera förklarande text bredvid
         self.pathlabeltext = tk.StringVar() #Skapa en sträng.
         self.pathlabeltext.set(sokvagstext) #Sätt strängen till defaulttexten.
         self.pathlabel = ttk.Label(textvariable=self.pathlabeltext) #Skapa en etikett.
-        self.pathlabel.grid(row=1,column=0) #Sätt texten på etiketten till den nyligen skapade strängen.
+        self.pathlabel.grid(row=1, column=0) #Sätt texten på etiketten till den nyligen skapade strängen.
 
         #Skapa ett textfält för den maximala massan.
         self.massfield = ttk.Entry()
-        self.massfield.insert(0,massdefault)
-        self.massfield.grid(row=2,column=1)
+        self.massfield.insert(0, massdefault)
+        self.massfield.grid(row=2, column=1)
 
         #Placera förklarande text bredvid.
         self.masslabeltext = tk.StringVar()
         self.masslabeltext.set(maxmassatext)
         self.masslabel = ttk.Label(textvariable=self.masslabeltext)
-        self.masslabel.grid(row=2,column=0)
+        self.masslabel.grid(row=2, column=0)
 
         #Skapa ett textfält för att läsa in en binfaktor.
         self.binfield = ttk.Entry()
-        self.binfield.insert(0,bindefault)
-        self.binfield.grid(row=3,column=1)
+        self.binfield.insert(0, bindefault)
+        self.binfield.grid(row=3, column=1)
 
         #Placera förklarande text bredvid.
         self.binlabeltext = tk.StringVar()
         self.binlabeltext.set(bintext)
         self.binlabel = ttk.Label(textvariable=self.binlabeltext)
-        self.binlabel.grid(row=3,column=0)
+        self.binlabel.grid(row=3, column=0)
 
         #Skapa och placera en kryssruta för om man vill göra en logplot.
         self.dolog = tk.IntVar() #Skapa en integer.
         self.logcheck = ttk.Checkbutton(variable=self.dolog) #Skapa en kryssruta som lagrar resultatet i den nyligen skapade integern.
-        self.logcheck.grid(row=4,column=1) #Placera kryssrutan i fönstret.
+        self.logcheck.grid(row=4, column=1) #Placera kryssrutan i fönstret.
 
         #Placera en förklarande text bredvid.
         self.loglabeltext = tk.StringVar()
         self.loglabeltext.set(logplottext)
         self.loglabel = ttk.Label(textvariable=self.loglabeltext)
-        self.loglabel.grid(row=4,column=0)
+        self.loglabel.grid(row=4, column=0)
 
         #Skapa en knapp som kallar på prepare_histogramifiera när den trycks på.
-        self.gobutton = ttk.Button(text=buttondefault,command=self.prepare_histogramifiera)
-        self.gobutton.grid(row=5,column=1)
+        self.gobutton = ttk.Button(text=buttondefault, command=self.prepare_histogramifiera)
+        self.gobutton.grid(row=5, column=1)
 
         #Skapa en liten text med versionen av programmet bredvid knappen.
         self.versionplugtext = tk.StringVar()
         self.versionplugtext.set(version)
-        self.versionplug = ttk.Label(textvariable=self.versionplugtext,foreground="gray")
-        self.versionplug.grid(row=5,column=0)
+        self.versionplug = ttk.Label(textvariable=self.versionplugtext, foreground="gray")
+        self.versionplug.grid(row=5, column=0)
 
         #---Denna ruta och dess text placeras ovanför fönstret. Man måste förstora det för att se.
         #Skapa och placera en kryssruta för om man vill skriva debuginformation till loggen.
         self.dodebug = tk.IntVar()
         self.debugcheck = ttk.Checkbutton(variable=self.dodebug)
-        self.debugcheck.grid(row=0,column=1)
+        self.debugcheck.grid(row=0, column=1)
         if debugdefault:
             self.dodebug.set(debugdefault)
 
@@ -145,12 +145,12 @@ class inputwindow(tk.Frame):
         self.debuglabeltext = tk.StringVar()
         self.debuglabeltext.set(debugtext)
         self.debuglabel = ttk.Label(textvariable=self.debuglabeltext)
-        self.debuglabel.grid(row=0,column=0)
+        self.debuglabel.grid(row=0, column=0)
 
         #Placera fokus i sökvägsfältet.
         self.pathfield.focus_set()
 
-    def histogramifiera(self,sokvag,max_massa,log_plot,binfaktor,debug):
+    def histogramifiera(self, sokvag, max_massa, log_plot, binfaktor, debug):
         """
         Läser in all data i txt-filer genererade av Hypatia som
         befinner sig i sökvägen sokvag. Rensar dem på skräp och
@@ -169,7 +169,7 @@ class inputwindow(tk.Frame):
         #Alla 'if debug ' utförs endast om den lilla debugrutan är ikryssad.
         if debug:
             #Skapa en logfil.
-            log = open("histogramifiera_log.txt","w")
+            log = open("histogramifiera_log.txt", "w")
             log.write("Detta är histogramifiera "+version+", skrivet av J Sörngård åt Vetenskapens Hus under 2019. Källkoden (och eventuella uppdateringar) finns på https://github.com/JSorngard/histogramifiera/releases.")
             log.write("\nDEBUG-läge aktiverat, fler utskrifter följer.")
             log.write("\nStapelfaktor: "+str(binfaktor)+", logplot: "+str(log_plot)+", maximal massa: "+str(max_massa)+", minimal massa: "+str(min_massa)+".\n")
@@ -221,13 +221,13 @@ class inputwindow(tk.Frame):
 
             #Sedan tar vi bort alla 'e', 'm', '4ee', '4mm', '4me' och ' '.
             for trash in pile:
-                contents = contents.replace(trash,"")
+                contents = contents.replace(trash, "")
             
             #Och delar upp filen efter radbrytningar.
             contents = contents.split("\n")
 
             #Sedan filtrerar vi ut alla rader som inte är någonting.
-            contents = list(filter(lambda x: x!='',contents))
+            contents = list(filter(lambda x: x!='', contents))
 
             if debug:
                 log.write("    rensade datan\n")
@@ -245,7 +245,7 @@ class inputwindow(tk.Frame):
                 log.write("     konverterade datan till flyttal\n")
             
             #Sedan lägger vi in den resulterande arrayen av siffror i slutet av 'data'.
-            data = np.append(data,np.array(contents))
+            data = np.append(data, np.array(contents))
             
         #Filtrera ut datapunkter större än max_massa (om angett) och mindre än min_massa.
         if max_massa != 0:
@@ -263,7 +263,7 @@ class inputwindow(tk.Frame):
 
         #Om vi vill göra en logplot så måste staplarna skalas korrekt.
         if log_plot:
-            bins = np.logspace(np.log10(min(data)),np.log10(max(data)),sig)
+            bins = np.logspace(np.log10(min(data)), np.log10(max(data)), sig)
         else:
             bins = sig
             
@@ -280,7 +280,7 @@ class inputwindow(tk.Frame):
 
             #Ta reda på standardkonfigurationen för matplotlibfönster.
             dpi = float(plt.rcParams.get("figure.dpi"))
-            hist_res_x,hist_res_y = [int(float(res)*dpi) for res in plt.rcParams.get("figure.figsize")]
+            hist_res_x, hist_res_y = [int(float(res)*dpi) for res in plt.rcParams.get("figure.figsize")]
 
             #Ta reda på inställningsfönstrets position och storlek.
             screen_w = self.master.winfo_screenwidth()
@@ -300,7 +300,8 @@ class inputwindow(tk.Frame):
             else:
                 #1/15 är ungefär delen av ett windowsskrivbord
                 #som tas upp av aktivitetsfältet.
-                y = options_y - (int(hist_res_y*(1+1/15)) - options_h)
+                #max(0,---) är för att fönstret inte ska hamna utanför skärmen.
+                y = max([0, options_y - (int(hist_res_y*(1+1/15)) - options_h)])
             
             #Placera föntret
             plt.get_current_fig_manager().window.geometry("+"+str(x)+"+"+str(y))
@@ -314,7 +315,7 @@ class inputwindow(tk.Frame):
             log.write("  genererar histogram\n")
 
         #Plotta histogrammet...
-        fig = plt.hist(data,bins=bins)
+        fig = plt.hist(data, bins=bins)
 
         #och sätt x-axeln till logaritmisk om vi gör en logplot.
         if log_plot:
@@ -349,7 +350,7 @@ class inputwindow(tk.Frame):
         debug = self.dodebug.get()
 
         #Byt ut \ mot \\ så att de kommer att tolkas korrekt av histogramifiera.
-        sokvag.replace("\\","\\\\")
+        sokvag.replace("\\", "\\\\")
 
         #Testa att läsa in maxmassan till en int, funkar det inte visas ett felmeddelande.
         if max_massa != "" and max_massa != "0":
@@ -378,16 +379,17 @@ class inputwindow(tk.Frame):
         log_plot = True if gorlogplot else False
 
         #Histogramifiera!
-        self.histogramifiera(sokvag,max_massa,log_plot,binfaktor,debug)
+        self.histogramifiera(sokvag, max_massa, log_plot, binfaktor, debug)
 
 
 #------------Startar upp det lilla inputfönstret-----------
 root = tk.Tk() #Skapa ett fönsterobjekt.
 root.title(titeltext) #Ange fönstrets titel.
 root.geometry(str(width)+"x"+str(height))
-root.minsize(width=width,height=height) #Gör så att fönstret inte går att förminska under en minimistorlek.
-try: #Försök att sätta fönsterikonen till ett kugghjul.
-    root.iconbitmap("kugghjul.ico")
+root.minsize(width=width, height=height) #Gör så att fönstret inte går att förminska under en minimistorlek.
+root.maxsize(width=width, height=height+20) #Och så att det inte går att förstora mer än vad som behövs.
+try: #Försök att sätta fönsterikonen till ett histogram.
+    root.iconbitmap("histogramifiera.ico")
 except: #Finns inte filen av någon anledning gör det inget.
     pass
 
