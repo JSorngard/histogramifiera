@@ -54,6 +54,9 @@ min_massa = 0     #Datavärden under detta ignoreras.
 pile = ['e', 'm', '4ee', '4mm', '4me', ' '] #En hög med skräp som ska rensas bort ur alla txt-filer. Placera ' ' sist.
 #----------------------------------------------------------
 
+#Ange denna som sann ifall du vill stänga av debugfunktionen
+release = True
+
 #Ta fram nuvarande sökväg.
 current_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -133,22 +136,27 @@ class inputwindow(tk.Frame):
         self.versionplug = ttk.Label(textvariable=self.versionplugtext, foreground="gray")
         self.versionplug.grid(row=5, column=0)
 
+        
         #---Denna ruta och dess text placeras ovanför fönstret. Man måste förstora det för att se.
         #Skapa och placera en kryssruta för om man vill skriva debuginformation till loggen.
-        self.dodebug = tk.IntVar()
-        self.debugcheck = ttk.Checkbutton(variable=self.dodebug)
-        self.debugcheck.grid(row=0, column=1)
-        if debugdefault:
-            self.dodebug.set(debugdefault)
+        if not release:
+	        self.dodebug = tk.IntVar()
+	        self.debugcheck = ttk.Checkbutton(variable=self.dodebug)
+	        self.debugcheck.grid(row=0, column=1)
+	        if debugdefault:
+	            self.dodebug.set(debugdefault)
 
-        #Placera en förklarande text bredvid.
-        self.debuglabeltext = tk.StringVar()
-        self.debuglabeltext.set(debugtext)
-        self.debuglabel = ttk.Label(textvariable=self.debuglabeltext)
-        self.debuglabel.grid(row=0, column=0)
+	        #Placera en förklarande text bredvid.
+	        self.debuglabeltext = tk.StringVar()
+	        self.debuglabeltext.set(debugtext)
+	        self.debuglabel = ttk.Label(textvariable=self.debuglabeltext)
+	        self.debuglabel.grid(row=0, column=0)
 
         #Placera fokus i sökvägsfältet.
         self.pathfield.focus_set()
+
+        #Gör så att om man trycker på Enter så görs histogrammet.
+        self.master.bind('<Return>',lambda e: self.gobutton.invoke())
 
     def histogramifiera(self, sokvag, max_massa, log_plot, binfaktor, debug):
         """
@@ -183,7 +191,7 @@ class inputwindow(tk.Frame):
             
         #Om det inte hittades några txt-filer så avslutar programmet sig självt.
         if len(files) == 0:
-            fel("Hittade inga txt-filer. Placera programmet i eller ange en sökväg till en mapp med txt-filer genererade av Hypatia. Använde sökvägen: \'"+sokvag+"\'.")
+            fel("Hittade inga txt-filer. Placera programmet i eller ange en sökväg till en mapp med txt-filer som elever genererat med Hypatia. Använde sökvägen: \'"+sokvag+"\'.")
             return
         elif debug:
             log.write("Hittade "+str(len(files))+" stycken.\n")
@@ -347,7 +355,10 @@ class inputwindow(tk.Frame):
         max_massa = self.massfield.get()
         gorlogplot = self.dolog.get()
         binfaktor = self.binfield.get()
-        debug = self.dodebug.get()
+        if not release:
+        	debug = self.dodebug.get()
+        else:
+        	debug = False
 
         #Byt ut \ mot \\ så att de kommer att tolkas korrekt av histogramifiera.
         sokvag.replace("\\", "\\\\")
@@ -387,7 +398,8 @@ root = tk.Tk() #Skapa ett fönsterobjekt.
 root.title(titeltext) #Ange fönstrets titel.
 root.geometry(str(width)+"x"+str(height))
 root.minsize(width=width, height=height) #Gör så att fönstret inte går att förminska under en minimistorlek.
-root.maxsize(width=width, height=height+20) #Och så att det inte går att förstora mer än vad som behövs.
+maxheight = height if release else height + 20 #Låt fönstret förstoras för att visa debugknappen om programmet är i utvecklingsfasen.
+root.maxsize(width=width, height=maxheight)
 try: #Försök att sätta fönsterikonen till ett histogram.
     root.iconbitmap("histogramifiera.ico")
 except: #Finns inte filen av någon anledning gör det inget.
