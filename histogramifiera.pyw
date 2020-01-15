@@ -1,5 +1,5 @@
 """
-Kodades av J Sörngård under 2019 för Vetenskapens Hus.
+Kodades av J Sörngård under 2019-2020 för Vetenskapens Hus.
 histogramifiera läser in data om partikelmassor som har exporterats
 från Hypatia.exe i form av txt-filer och plottar den i ett histogram.
 """
@@ -7,8 +7,8 @@ från Hypatia.exe i form av txt-filer och plottar den i ett histogram.
 #----------Läs in eventuella kommandoradsalternativ--------
 #argparse funkar inte om man kompilerar till en exekverbar fil
 #import argparse
-version = "v1.02"
-#parser = argparse.ArgumentParser(description="Plotta data i txt-fier som exporterats från Hypatia.exe i ett histogram. Kodades av J Sörngård under 2019 för Vetenskapens Hus.")
+version = "v1.03"
+#parser = argparse.ArgumentParser(description="Plotta data i txt-fier som exporterats från Hypatia.exe i ett histogram. Kodades av J Sörngård under 2019-2020 för Vetenskapens Hus.")
 #parser.add_argument("--version",required=False,action="store_true",help="Skriv ut programversionen och avsluta.")
 #parser.add_argument("--debug",required=False,action="store_true",help="Skriv ut extrainformation till en loggfil. Går även att ange detta i inställningsfönstret om man förstorar det.")
 #args = vars(parser.parse_args())
